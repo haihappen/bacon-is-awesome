@@ -10,8 +10,6 @@ class App extends Component {
 
 
   render() {
-    var text = "Hallo";
-
     return (
       <div>
         <TextInput stream={this.state.stream} />
