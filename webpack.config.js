@@ -7,7 +7,7 @@ module.exports = {
     loaders: [{
       test: /\.jsx?$/,
       exclude: /node_modules/,
-      loader: 'babel'
+      loader: 'babel?stage=0&loose[]=es6.modules&loose[]=es6.classes'
     }]
   },
   plugins: [
