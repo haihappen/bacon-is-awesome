@@ -1,23 +1,98 @@
-import jQuery from 'jquery';
-import Bacon from 'baconjs';
-import BaconUI from 'baconui';
+import Bacon, { Bus } from 'baconjs';
+import React, { Component, PropTypes } from 'react';
 
 
-// let textFieldValue = (textField) =>
-//   textField.asEventStream('keyup').map(() => textField.val()).toProperty('');
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { stream: new Bus() };
+  }
 
 
-let username = BaconUI.textFieldValue($('input[name=username]'));
-let fullname = BaconUI.textFieldValue($('input[name=fullname]'));
+  render() {
+    var text = "Hallo";
 
-// let and = (a, b) => a && b
+    return (
+      <div>
+        <TextInput stream={this.state.stream} />
+        <Label stream={this.state.stream} />
+        <InvertedLabel stream={this.state.stream} />
+      </div>
+    );
+  }
+}
 
-let nonEmpty = x => x.length > 0
 
-let usernameEntered = username.map(nonEmpty);
-let fullnameEntered = fullname.map(nonEmpty);
+class TextInput extends Component {
+  static propTypes = {
+    stream: PropTypes.instanceOf(Bus).isRequired
+  }
 
-let setEnabled = (element, enabled) => element.attr('disabled', !enabled);
 
-let buttonEnabled = usernameEntered.and(fullnameEntered);
-buttonEnabled.assign(setEnabled, $('button'))
+  constructor(props) {
+    super(props);
+    this.state = { text: '' };
+  }
+
+
+  render() {
+    return <input
+              type="text"
+              ref="input"
+              value={this.state.text}
+              onChange={()=>this.handleChange()}
+            />;
+  }
+
+
+  handleChange() {
+    let text = React.findDOMNode(this.refs.input).value;
+
+    this.setState({ text });
+    this.props.stream.push(text);
+  }
+}
+
+
+class Label extends React.Component {
+  static propTypes = {
+    stream: PropTypes.instanceOf(Bus).isRequired
+  }
+
+
+  constructor(props) {
+    super(props);
+    this.state = { text: '' };
+  }
+
+
+  componentWillMount() {
+    this.props.stream.toProperty('').onValue((text) => {
+      this.setState({ text });
+    });
+  }
+
+
+  render() {
+    return <p>{this.state.text}</p>;
+  }
+}
+
+
+class InvertedLabel extends Label {
+  static propTypes = {
+    stream: PropTypes.instanceOf(Bus).isRequired
+  }
+
+
+  componentWillMount() {
+    let reverse = (string) => string.split('').reverse().join('');
+
+    this.props.stream.map(reverse).toProperty('').onValue((text) => {
+      this.setState({ text });
+    });
+  }
+}
+
+
+React.render(<App />, document.body);
