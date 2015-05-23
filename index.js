@@ -5,16 +5,16 @@ import React, { Component, PropTypes } from 'react';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { stream: new Bus() };
+    this.state = { text: new Bus() };
   }
 
 
   render() {
     return (
       <div>
-        <TextInput stream={this.state.stream} />
-        <Label stream={this.state.stream} />
-        <InvertedLabel stream={this.state.stream} />
+        <TextInput text={this.state.text} />
+        <Label text={this.state.text} />
+        <InvertedLabel text={this.state.text} />
       </div>
     );
   }
@@ -23,7 +23,7 @@ class App extends Component {
 
 class TextInput extends Component {
   static propTypes = {
-    stream: PropTypes.instanceOf(Bus).isRequired
+    text: PropTypes.instanceOf(Bus).isRequired
   }
 
 
@@ -47,25 +47,25 @@ class TextInput extends Component {
     let text = React.findDOMNode(this.refs.input).value;
 
     this.setState({ text });
-    this.props.stream.push(text);
+    this.props.text.push(text);
   }
 }
 
 
 class Label extends React.Component {
   static propTypes = {
-    stream: PropTypes.instanceOf(Bus).isRequired
+    text: PropTypes.instanceOf(Bus).isRequired
   }
 
 
   constructor(props) {
     super(props);
-    this.state = { text: '' };
+    this.state = { text: '' };
   }
 
 
   componentWillMount() {
-    this.props.stream.toProperty('').onValue((text) => {
+    this.props.text.toProperty('').onValue((text) => {
       this.setState({ text });
     });
   }
@@ -79,14 +79,14 @@ class Label extends React.Component {
 
 class InvertedLabel extends Label {
   static propTypes = {
-    stream: PropTypes.instanceOf(Bus).isRequired
+    text: PropTypes.instanceOf(Bus).isRequired
   }
 
 
   componentWillMount() {
     let reverse = (string) => string.split('').reverse().join('');
 
-    this.props.stream.map(reverse).toProperty('').onValue((text) => {
+    this.props.text.map(reverse).toProperty('').onValue((text) => {
       this.setState({ text });
     });
   }
